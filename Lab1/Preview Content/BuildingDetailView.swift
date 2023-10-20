@@ -1,4 +1,5 @@
 import SwiftUI
+import MapKit
 
 struct BuildingDetailView: View {
     
@@ -12,9 +13,19 @@ struct BuildingDetailView: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 330.0, height: 165.0) // Adjust the height of the top image as needed
             
-            Text(building.name)
-                .font(.largeTitle)
+            HStack {
+                Text(building.name)
+                    .font(.largeTitle)
                 .padding([.leading, .trailing])
+                Spacer()
+                Button(action: {
+                        
+                    }) {
+                        Image(systemName: building.favourite ? "heart.fill" : "heart")
+                            .padding(.trailing, 20.0)
+                            .font(.title)
+                    }
+            }
             
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 0.0) {
@@ -68,7 +79,15 @@ struct BuildingDetailView: View {
         description: "Fusce volutpat leo nunc, id lobortis ligula porta in. Nulla varius lorem ac magna condimentum dapibus. Vestibulum pulvinar justo a ex tincidunt, a pulvinar tortor mollis. Aliquam hendrerit pretium sollicitudin.",
         imageName: "MainImage",
         isForDisabled: .limited,
-        isWiFi: false,
-        map: "Map"
+        isWiFi: true,
+        map: "Map",
+        building: .dormitory,
+        polygon: MKPolygon(coordinates: [
+            CLLocationCoordinate2D(latitude: 19.912784, longitude: 50.0672586),
+            CLLocationCoordinate2D(latitude: 19.9127486, longitude: 50.067163),
+            CLLocationCoordinate2D(latitude: 19.9128873, longitude: 50.0671416),
+            CLLocationCoordinate2D(latitude: 19.9129232, longitude: 50.0672372)
+          ], count: 4),
+        favourite: false
     ))
 }

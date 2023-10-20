@@ -6,66 +6,58 @@
 //
 
 import SwiftUI
+import MapKit
+
 
 struct BuildingListView: View {
-    let buildings: [Building] = [
-        Building(
-            name: "Budynek DS-16",
-            subName: "Dom Studencki Itaka",
-            address: "Ul. Tokarskiego 10, 30-065 Kraków",
-            description: "Fusce volutpat leo nunc, id lobortis ligula porta in. Nulla varius lorem ac magna condimentum dapibus. Vestibulum pulvinar justo a ex tincidunt, a pulvinar tortor mollis. Aliquam hendrerit pretium sollicitudin.",
-            imageName: "MainImage",
-            isForDisabled: .limited,
-            isWiFi: true,
-            map: "Map"
-        ),
-        Building(
-            name: "D-17",
-            subName: "Centrum Informatyki AGH",
-            address: "Kraków Kawiory 21, 30-055",
-            description: "Budynek ma dziwną numerację poziomów - parter to 1, nie 0. Mo-Su 06:00-22:00",
-            imageName: "MainImage",
-            isForDisabled: .yes,
-            isWiFi: true,
-            map: "Map"
-        ),
-        Building(
-            name: "D-16",
-            subName: "Wydział Fizyki",
-            address: "Kraków Kawiory 30, 30-055",
-            description: "Fusce volutpat leo nunc, id lobortis ligula porta in. Nulla varius lorem ac magna condimentum dapibus. Vestibulum pulvinar justo a ex tincidunt.",
-            imageName: "MainImage",
-            isForDisabled: .limited,
-            isWiFi: false,
-            map: "Map"
-        ),
-        Building(
-            name: "U-3",
-            subName: "Przychodnia Akademicka",
-            address: "Kraków Akademicka 5, 30-055",
-            description: "Fusce volutpat leo nunc, id lobortis ligula porta in. Mo-Fr 08:00-18:00",
-            imageName: "MainImage",
-            isForDisabled: .no,
-            isWiFi: false,
-            map: "Map"
-        ),
-    ]
+    var buildings: [Building] = Building.sampleBuildings
     
     @State private var selectedBuilding: Building?
     @State private var isBuildingDetailViewPresented = false
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List(buildings) { building in
                 Button(action: {
                     self.selectedBuilding = building
                     self.isBuildingDetailViewPresented.toggle()
                 }) {
-                    Text(building.name)
-                }.onAppear {
+                    HStack {
+                        Text(building.name)
+                            .font(.headline)
+                            .foregroundColor(Theme.textColor(for: building.building))
+                        .multilineTextAlignment(.leading)
+                        Spacer()
+                        Image(systemName: (building.favourite ? "heart.fill" : "heart"))
+                            .font(.title3)
+                    }
+                    HStack {
+                        Text(building.subName)
+                            .foregroundColor(Theme.textColor(for: building.building))
+                        Spacer()
+                        Image(systemName: (building.isWiFi ? "wifi" : "wifi.slash"))
+                            .font(.title3)
+                            .foregroundColor(building.isWiFi ? Color.blue : Color.gray) // Set the color to blue when showLimitedIcon is true, otherwise gray
+                            .padding(1.0)
+                        Image(systemName: "figure.roll")
+                            .font(.title3)
+                            .foregroundColor(
+                            building.isForDisabled == .yes ? Color.blue :
+                                (building.isForDisabled == .limited ? Color.yellow : Color.gray)
+                            )
+                            .padding(1.0)
+                    }
+                    
+                    
+                }
+                .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+                .onAppear {
                     // This code will be executed when the view appears on the screen
                     print(building)
                 }
+                .listRowBackground(Theme.backgroundColor(for: building.building))
+                .listRowSeparator(/*@START_MENU_TOKEN@*/.visible/*@END_MENU_TOKEN@*/)
+                
             }
             .sheet(isPresented: $isBuildingDetailViewPresented) {
                 if let selectedBuilding = self.selectedBuilding {
