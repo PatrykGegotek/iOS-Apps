@@ -8,13 +8,13 @@ struct BuildingDetailView: View {
     @State private var showLimitedIcon = true // Define a boolean variable
     var body: some View {
         VStack {
-            Image(building.imageName) // Replace "topImage" with the name of your top image asset
+            Image(building.imageURL) // Replace "topImage" with the name of your top image asset
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 330.0, height: 165.0) // Adjust the height of the top image as needed
             
             HStack {
-                Text(building.name)
+                Text(building.symbol)
                     .font(.largeTitle)
                 .padding([.leading, .trailing])
                 Spacer()
@@ -29,26 +29,26 @@ struct BuildingDetailView: View {
             
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 0.0) {
-                    Text(building.subName)
+                    Text(building.name)
                         .font(.title2)
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
-                    Text(building.address)
+                    Text(building.street)
                         .font(.body)
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(/*@START_MENU_TOKEN@*/.all, 1.0/*@END_MENU_TOKEN@*/)
                 Spacer()
-                Image(systemName: (building.isWiFi ? "wifi" : "wifi.slash"))
+                Image(systemName: (building.wifi ? "wifi" : "wifi.slash"))
                     .font(.title)
-                    .foregroundColor(building.isWiFi ? Color.blue : Color.gray) // Set the color to blue when showLimitedIcon is true, otherwise gray
+                    .foregroundColor(building.wifi ? Color.blue : Color.gray) // Set the color to blue when showLimitedIcon is true, otherwise gray
                     .padding(1.0)
                 Image(systemName: "figure.roll")
                     .font(.title)
                     .foregroundColor(
-                        building.isForDisabled == .yes ? Color.blue :
-                            (building.isForDisabled == .limited ? Color.yellow : Color.gray)
+                        building.wheelchair == .yes ? Color.blue :
+                            (building.wheelchair == .limited ? Color.yellow : Color.gray)
                     )
                     .padding(1.0)
                 
@@ -71,23 +71,23 @@ struct BuildingDetailView: View {
     }
 }
 
-#Preview {
-    BuildingDetailView(building: Building(
-        name: "Budynek DS-16",
-        subName: "Dom Studencki Itaka",
-        address: "Ul. Tokarskiego 10, 30-065 Kraków",
-        description: "Fusce volutpat leo nunc, id lobortis ligula porta in. Nulla varius lorem ac magna condimentum dapibus. Vestibulum pulvinar justo a ex tincidunt, a pulvinar tortor mollis. Aliquam hendrerit pretium sollicitudin.",
-        imageName: "MainImage",
-        isForDisabled: .limited,
-        isWiFi: true,
-        map: "Map",
-        building: .dormitory,
-        polygon: MKPolygon(coordinates: [
-            CLLocationCoordinate2D(latitude: 19.912784, longitude: 50.0672586),
-            CLLocationCoordinate2D(latitude: 19.9127486, longitude: 50.067163),
-            CLLocationCoordinate2D(latitude: 19.9128873, longitude: 50.0671416),
-            CLLocationCoordinate2D(latitude: 19.9129232, longitude: 50.0672372)
-          ], count: 4),
-        favourite: false
-    ))
-}
+//#Preview {
+//    BuildingDetailView(building: Building(
+//        name: "Budynek DS-16",
+//        subName: "Dom Studencki Itaka",
+//        address: "Ul. Tokarskiego 10, 30-065 Kraków",
+//        description: "Fusce volutpat leo nunc, id lobortis ligula porta in. Nulla varius lorem ac magna condimentum dapibus. Vestibulum pulvinar justo a ex tincidunt, a pulvinar tortor mollis. Aliquam hendrerit pretium sollicitudin.",
+//        imageName: "MainImage",
+//        isForDisabled: .limited,
+//        isWiFi: true,
+//        map: "Map",
+//        building: .dormitory,
+//        polygon: MKPolygon(coordinates: [
+//            CLLocationCoordinate2D(latitude: 19.912784, longitude: 50.0672586),
+//            CLLocationCoordinate2D(latitude: 19.9127486, longitude: 50.067163),
+//            CLLocationCoordinate2D(latitude: 19.9128873, longitude: 50.0671416),
+//            CLLocationCoordinate2D(latitude: 19.9129232, longitude: 50.0672372)
+//          ], count: 4),
+//        favourite: false
+//    ))
+//}
