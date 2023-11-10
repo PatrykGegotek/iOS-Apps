@@ -61,7 +61,6 @@ struct Building: Identifiable, Codable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-//        id = try container.decode(UUID.self, forKey: .id)
         symbol = try container.decode(String.self, forKey: .symbol)
         name = try container.decode(String.self, forKey: .name)
         street = try container.decode(String.self, forKey: .street)
@@ -73,13 +72,24 @@ struct Building: Identifiable, Codable {
         type = try container.decode(BuildingType.self, forKey: .type)
         favourite = false
 
-        // Decode MKPolygon from the stored data
-        let polygonData = try container.decode(Data.self, forKey: .polygon)
-        if let decodedPolygon = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(polygonData) as? MKPolygon {
-            polygon = decodedPolygon
+        var coordinates: [CLLocationCoordinate2D] = []
+        
+        if let singleName = try? container.decode(String.self, forKey: .name) {
+            name = singleName
+        } else if var nameArray = try? container.nestedUnkeyedContainer(forKey: .name) {
+            // Handle the case where name is an array of strings
+            var names: [String] = []
+            while !nameArray.isAtEnd {
+                if let singleName = try? nameArray.decode(String.self) {
+                    names.append(singleName)
+                }
+            }
+            name = names.joined(separator: ", ")  // Combine names into a single string
         } else {
-            throw DecodingError.dataCorruptedError(forKey: .polygon, in: container, debugDescription: "Failed to decode MKPolygon.")
+            throw DecodingError.dataCorruptedError(forKey: .name, in: container, debugDescription: "Failed to decode name.")
         }
+        
+        polygon = MKPolygon(coordinates: &coordinates, count: coordinates.count)
     }
     
 //    static var sampleBuildings: [Building] = [
