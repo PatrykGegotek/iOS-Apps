@@ -8,9 +8,9 @@ class Theme {
         
         switch buildingType {
         case .dormitory:
-            color = .gray
+            color = .red
         case .university:
-            color = .pink
+            color = .cyan
         case .other:
             color = .orange
         }
@@ -25,9 +25,9 @@ class Theme {
         case .dormitory:
             color = .black
         case .university:
-            color = .green
+            color = .yellow
         case .other:
-            color = .gray
+            color = .blue
         }
         
         return color

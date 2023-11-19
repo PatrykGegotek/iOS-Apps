@@ -68,6 +68,7 @@ struct BuildingDetailView: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(height: 250) // Adjust the height of the bottom image as needed
         }
+        .navigationTitle("Szczegóły Budynku")
     }
 }
 

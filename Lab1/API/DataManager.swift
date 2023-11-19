@@ -1,6 +1,6 @@
 import Foundation
 
-class DataManager {
+class DataManager: ObservableObject {
     static let shared = DataManager()
 
     private var buildings: [Building] = []
