@@ -53,7 +53,7 @@ class DataManager {
                 // Zdekoduj pobrane dane
                 let decodedBuildings = try JSONDecoder().decode([Building].self, from: data)
                 self.buildings = decodedBuildings
-
+                print("Dane pobrane")
                 // Zapisz dane do pliku lokalnego
                 self.saveDataToLocalFile()
             } catch {
@@ -67,6 +67,7 @@ class DataManager {
             // Zapisz dane do pliku lokalnego
             let encodedData = try JSONEncoder().encode(buildings)
             try encodedData.write(to: localDataURL)
+            print("Dane zapisane do: \(localDataURL)")
         } catch {
             print("Błąd podczas zapisywania danych do pliku: \(error)")
         }

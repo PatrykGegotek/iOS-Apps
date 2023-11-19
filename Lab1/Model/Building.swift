@@ -62,32 +62,32 @@ struct Building: Identifiable, Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         symbol = try container.decode(String.self, forKey: .symbol)
-        name = try container.decode(String.self, forKey: .name)
+        name = (try? container.decode(String.self, forKey: .name)) ?? "budynek"
         street = try container.decode(String.self, forKey: .street)
         description = try container.decode(String.self, forKey: .description)
-        imageURL = try container.decode(String.self, forKey: .imageURL)
+        imageURL = (try? container.decode(String.self, forKey: .imageURL)) ?? "https://tools.sokoloowski.pl/pum-api/static/images/c-1.jpg"
         wheelchair = try container.decode(DisabledAccessibility.self, forKey: .wheelchair)
         wifi = try container.decode(Bool.self, forKey: .wifi)
         map = "map"
-        type = try container.decode(BuildingType.self, forKey: .type)
+        type = (try? container.decode(BuildingType.self, forKey: .type)) ?? BuildingType.other
         favourite = false
 
         var coordinates: [CLLocationCoordinate2D] = []
         
-        if let singleName = try? container.decode(String.self, forKey: .name) {
-            name = singleName
-        } else if var nameArray = try? container.nestedUnkeyedContainer(forKey: .name) {
-            // Handle the case where name is an array of strings
-            var names: [String] = []
-            while !nameArray.isAtEnd {
-                if let singleName = try? nameArray.decode(String.self) {
-                    names.append(singleName)
-                }
-            }
-            name = names.joined(separator: ", ")  // Combine names into a single string
-        } else {
-            throw DecodingError.dataCorruptedError(forKey: .name, in: container, debugDescription: "Failed to decode name.")
-        }
+//        if let singleName = try? container.decode(String.self, forKey: .name) {
+//            name = singleName
+//        } else if var nameArray = try? container.nestedUnkeyedContainer(forKey: .name) {
+//            // Handle the case where name is an array of strings
+//            var names: [String] = []
+//            while !nameArray.isAtEnd {
+//                if let singleName = try? nameArray.decode(String.self) {
+//                    names.append(singleName)
+//                }
+//            }
+//            name = names.joined(separator: ", ")  // Combine names into a single string
+//        } else {
+//            throw DecodingError.dataCorruptedError(forKey: .name, in: container, debugDescription: "Failed to decode name.")
+//        }
         
         polygon = MKPolygon(coordinates: &coordinates, count: coordinates.count)
     }
