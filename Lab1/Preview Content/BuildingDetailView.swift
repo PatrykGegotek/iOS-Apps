@@ -3,28 +3,29 @@ import MapKit
 
 struct BuildingDetailView: View {
     
-    var building: Building
+    @ObservedObject var building: Building
     
-    @State private var showLimitedIcon = true // Define a boolean variable
     var body: some View {
         VStack {
-            Image(building.imageURL) // Replace "topImage" with the name of your top image asset
+            Image(building.imageURL)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: 330.0, height: 165.0) // Adjust the height of the top image as needed
+                .frame(width: 330.0, height: 165.0)
             
             HStack {
                 Text(building.symbol)
                     .font(.largeTitle)
-                .padding([.leading, .trailing])
+                    .padding([.leading, .trailing])
                 Spacer()
                 Button(action: {
-                        
-                    }) {
-                        Image(systemName: building.favourite ? "heart.fill" : "heart")
-                            .padding(.trailing, 20.0)
-                            .font(.title)
-                    }
+//                    building.favourite.toggle()
+                    DataManager.shared.toggleFavourite(for: building.id)
+                }) {
+                    Image(systemName: building.favourite ? "heart.fill" : "heart")
+                        .padding(.trailing, 20.0)
+                        .font(.title)
+                        .foregroundColor(Color.red)
+                }
             }
             
             HStack(alignment: .center) {
@@ -42,7 +43,7 @@ struct BuildingDetailView: View {
                 Spacer()
                 Image(systemName: (building.wifi ? "wifi" : "wifi.slash"))
                     .font(.title)
-                    .foregroundColor(building.wifi ? Color.blue : Color.gray) // Set the color to blue when showLimitedIcon is true, otherwise gray
+                    .foregroundColor(building.wifi ? Color.blue : Color.gray)
                     .padding(1.0)
                 Image(systemName: "figure.roll")
                     .font(.title)
@@ -61,14 +62,29 @@ struct BuildingDetailView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding()
             
-            
-            
-            Image("Map") // Replace "bottomImage" with the name of your bottom image asset
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(height: 250) // Adjust the height of the bottom image as needed
+            Map(coordinateRegion: .constant(mapRegion()),
+                annotationItems: [building]) { building in
+                MapAnnotation(coordinate: building.polygon.coordinate) {
+                    PolygonAnnotationView(polygon: building.polygon)
+                }
+            }
+                .frame(height: 250)
         }
         .navigationTitle("Szczegóły Budynku")
+    }
+    
+    private func mapRegion() -> MKCoordinateRegion {
+            let polygon = building.polygon
+            let region = MKCoordinateRegion(polygon.boundingMapRect)
+            return region
+        }
+}
+
+struct PolygonAnnotationView: View {
+    var polygon: MKPolygon
+
+    var body: some View {
+        // Tu możesz zdefiniować, jak ma wyglądać widok dla wielokąta, np. znacznik
     }
 }
 

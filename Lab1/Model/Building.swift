@@ -13,7 +13,7 @@ enum BuildingType: String, Codable {
     case other
 }
 
-struct Building: Identifiable, Codable {
+class Building: Identifiable, Codable, ObservableObject {
     var id = UUID()
     var symbol: String
     var name: String
@@ -25,7 +25,7 @@ struct Building: Identifiable, Codable {
     var map: String
     var type: BuildingType
     var polygon: MKPolygon
-    var favourite: Bool
+    @Published var favourite: Bool
 
     // Custom coding keys to handle the custom types
     private enum CodingKeys: String, CodingKey {
@@ -59,7 +59,7 @@ struct Building: Identifiable, Codable {
         try container.encode(polygonData, forKey: .polygon)
     }
 
-    init(from decoder: Decoder) throws {
+    required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         symbol = try container.decode(String.self, forKey: .symbol)
         name = (try? container.decode(String.self, forKey: .name)) ?? "budynek"

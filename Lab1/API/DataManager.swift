@@ -3,7 +3,7 @@ import Foundation
 class DataManager: ObservableObject {
     static let shared = DataManager()
 
-    private var buildings: [Building] = []
+    @Published private var buildings: [Building] = []
 
     // Ścieżka do lokalnego pliku JSON w katalogu dokumentów
     private let localDataURL: URL = {
@@ -25,6 +25,15 @@ class DataManager: ObservableObject {
         return buildings
     }
 
+    func toggleFavourite(for buildingId: UUID) {
+            if let index = buildings.firstIndex(where: { $0.id == buildingId }) {
+                print("Changing building \(buildingId) \(buildings[index].name)")
+                print("Favourite: \(buildings[index].favourite)")
+                buildings[index].favourite.toggle()
+                self.buildings = buildings.map { $0 }
+            }
+        }
+    
     private func loadData() {
         // Sprawdź, czy plik lokalny istnieje
         if FileManager.default.fileExists(atPath: localDataURL.path) {
@@ -42,7 +51,7 @@ class DataManager: ObservableObject {
         }
     }
 
-    private func fetchDataFromAPI() {
+    func fetchDataFromAPI() {
         URLSession.shared.dataTask(with: apiURL) { (data, response, error) in
             guard let data = data, error == nil else {
                 print("Błąd podczas pobierania danych z API: \(error?.localizedDescription ?? "Nieznany błąd")")
