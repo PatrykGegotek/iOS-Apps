@@ -7,9 +7,21 @@ struct BuildingListView: View {
     @ObservedObject var dataManager = DataManager.shared
     @State private var showingAlert = false
     
+    func printPolygonInfo(for building: Building) {
+            let coordinates = building.polygon.coordinates
+            print("Polygon dla budynku \(building.name):")
+            coordinates.forEach { coord in
+                print("(\(coord.latitude), \(coord.longitude))")
+            }
+        }
+    
+    var filteredBuildings: [Building] {
+            dataManager.getBuildings().filter { $0.name != "budynek" }
+        }
+    
     var body: some View {
         NavigationStack {
-            List(dataManager.getBuildings()) { building in
+            List(filteredBuildings) { building in
                 NavigationLink(destination: BuildingDetailView(building: building)) {
                     VStack(alignment: .leading) {
                         HStack {
@@ -20,6 +32,8 @@ struct BuildingListView: View {
                             Image(systemName: building.favourite ? "heart.fill" : "heart")
                                 .font(.title3)
                                 .foregroundColor(Color.red)
+                        }.onAppear {
+                            printPolygonInfo(for: building)
                         }
                         
                         HStack {

@@ -1,6 +1,15 @@
 import Foundation
 import MapKit
 
+
+extension MKPolygon {
+    var coordinates: [CLLocationCoordinate2D] {
+        var coords = [CLLocationCoordinate2D](repeating: CLLocationCoordinate2D(), count: self.pointCount)
+        self.getCoordinates(&coords, range: NSRange(location: 0, length: self.pointCount))
+        return coords
+    }
+}
+
 enum DisabledAccessibility: String, Codable {
     case yes
     case no
@@ -52,11 +61,6 @@ class Building: Identifiable, Codable, ObservableObject {
         try container.encode(wheelchair, forKey: .wheelchair)
         try container.encode(wifi, forKey: .wifi)
         try container.encode(type, forKey: .type)
-//        try container.encode(favourite, forKey: .favourite)/
-
-        // Convert MKPolygon to a format that can be encoded
-        let polygonData = try NSKeyedArchiver.archivedData(withRootObject: polygon, requiringSecureCoding: false)
-        try container.encode(polygonData, forKey: .polygon)
     }
 
     required init(from decoder: Decoder) throws {
@@ -65,109 +69,47 @@ class Building: Identifiable, Codable, ObservableObject {
         name = (try? container.decode(String.self, forKey: .name)) ?? "budynek"
         street = try container.decode(String.self, forKey: .street)
         description = try container.decode(String.self, forKey: .description)
-        imageURL = (try? container.decode(String.self, forKey: .imageURL)) ?? "https://tools.sokoloowski.pl/pum-api/static/images/c-1.jpg"
+        imageURL = (try? container.decode(String.self, forKey: .imageURL)) ?? "ttps://tools.sokoloowski.pl/pum-api/static/images/a-4.jpg"
         wheelchair = try container.decode(DisabledAccessibility.self, forKey: .wheelchair)
         wifi = try container.decode(Bool.self, forKey: .wifi)
         map = "map"
         type = (try? container.decode(BuildingType.self, forKey: .type)) ?? BuildingType.other
         favourite = false
+        
+        
+        if let coordinateArray = try? container.decode([[String: Double]].self, forKey: .polygon) {
+            let coordinates = coordinateArray.map { CLLocationCoordinate2D(latitude: $0["lat"] ?? 0, longitude: $0["lon"] ?? 0) }
+            polygon = MKPolygon(coordinates: coordinates, count: coordinates.count)
+        } else {
+            polygon = MKPolygon()
+        }
 
-        var coordinates: [CLLocationCoordinate2D] = []
-        
-//        if let singleName = try? container.decode(String.self, forKey: .name) {
-//            name = singleName
-//        } else if var nameArray = try? container.nestedUnkeyedContainer(forKey: .name) {
-//            // Handle the case where name is an array of strings
-//            var names: [String] = []
-//            while !nameArray.isAtEnd {
-//                if let singleName = try? nameArray.decode(String.self) {
-//                    names.append(singleName)
-//                }
-//            }
-//            name = names.joined(separator: ", ")  // Combine names into a single string
-//        } else {
-//            throw DecodingError.dataCorruptedError(forKey: .name, in: container, debugDescription: "Failed to decode name.")
-//        }
-        
-        polygon = MKPolygon(coordinates: &coordinates, count: coordinates.count)
     }
-    
-//    static var sampleBuildings: [Building] = [
-//        Building(
-//            name: "DS-16",
-//            subName: "Dom Studencki Itaka",
-//            address: "Ul. Tokarskiego 10, 30-065 Kraków",
-//            description: "Fusce volutpat leo nunc, id lobortis ligula porta in. Nulla varius lorem ac magna condimentum dapibus. Vestibulum pulvinar justo a ex tincidunt, a pulvinar tortor mollis. Aliquam hendrerit pretium sollicitudin.",
-//            imageName: "MainImage",
-//            isForDisabled: .limited,
-//            isWiFi: true,
-//            map: "Map",
-//            building: .dormitory,
-//            polygon: MKPolygon(coordinates: [
-//                CLLocationCoordinate2D(latitude: 19.912784, longitude: 50.0672586),
-//                CLLocationCoordinate2D(latitude: 19.9127486, longitude: 50.067163),
-//                CLLocationCoordinate2D(latitude: 19.9128873, longitude: 50.0671416),
-//                CLLocationCoordinate2D(latitude: 19.9129232, longitude: 50.0672372)
-//              ], count: 4),
-//            favourite: false
-//        ),
-//        Building(
-//            name: "D-17",
-//            subName: "Centrum Informatyki AGH",
-//            address: "Kraków Kawiory 21, 30-055",
-//            description: "Budynek ma dziwną numerację poziomów - parter to 1, nie 0. Mo-Su 06:00-22:00",
-//            imageName: "MainImage",
-//            isForDisabled: .yes,
-//            isWiFi: true,
-//            map: "Map",
-//            building: .univerity,
-//            polygon: MKPolygon(coordinates: [
-//                CLLocationCoordinate2D(latitude: 19.912784, longitude: 50.0672586),
-//                CLLocationCoordinate2D(latitude: 19.9127486, longitude: 50.067163),
-//                CLLocationCoordinate2D(latitude: 19.9128873, longitude: 50.0671416),
-//                CLLocationCoordinate2D(latitude: 19.9129232, longitude: 50.0672372)
-//              ], count: 4),
-//            favourite: false
-//        ),
-//        Building(
-//            name: "U-3",
-//            subName: "Przychodnia Akademicka",
-//            address: "Kraków Akademicka 5, 30-055",
-//            description: "Fusce volutpat leo nunc, id lobortis ligula porta in. Mo-Fr 08:00-18:00",
-//            imageName: "MainImage",
-//            isForDisabled: .no,
-//            isWiFi: false,
-//            map: "Map",
-//            building: .other,
-//            polygon: MKPolygon(coordinates: [
-//                CLLocationCoordinate2D(latitude: 19.912784, longitude: 50.0672586),
-//                CLLocationCoordinate2D(latitude: 19.9127486, longitude: 50.067163),
-//                CLLocationCoordinate2D(latitude: 19.9128873, longitude: 50.0671416),
-//                CLLocationCoordinate2D(latitude: 19.9129232, longitude: 50.0672372)
-//              ], count: 4),
-//            favourite: false
-//        ),
-//        Building(
-//            name: "D-16",
-//            subName: "Wydział Fizyki",
-//            address: "Kraków Kawiory 30, 30-055",
-//            description: "Fusce volutpat leo nunc, id lobortis ligula porta in. Nulla varius lorem ac magna condimentum dapibus. Vestibulum pulvinar justo a ex tincidunt.",
-//            imageName: "MainImage",
-//            isForDisabled: .limited,
-//            isWiFi: false,
-//            map: "Map",
-//            building: .univerity,
-//            polygon: MKPolygon(coordinates: [
-//                CLLocationCoordinate2D(latitude: 19.912784, longitude: 50.0672586),
-//                CLLocationCoordinate2D(latitude: 19.9127486, longitude: 50.067163),
-//                CLLocationCoordinate2D(latitude: 19.9128873, longitude: 50.0671416),
-//                CLLocationCoordinate2D(latitude: 19.9129232, longitude: 50.0672372)
-//              ], count: 4),
-//            favourite: false
-//        ),
-//    ]
 }
 
+func convertStringToCoordinates(_ string: String) -> [CLLocationCoordinate2D] {
+    guard let data = Data(base64Encoded: string) else {
+        print("Nie można zdekodować danych base64.")
+        return []
+    }
 
+    do {
+        if let array = try PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [[String: Any]] {
+            return array.compactMap { dict in
+                guard let latitude = dict["lat"] as? Double,
+                      let longitude = dict["lon"] as? Double else {
+                    return nil
+                }
+                return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            }
+        } else {
+            print("Niepoprawny format plist.")
+            return []
+        }
+    } catch {
+        print("Błąd podczas dekodowania plist: \(error)")
+        return []
+    }
+}
 
 

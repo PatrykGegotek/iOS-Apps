@@ -18,7 +18,7 @@ struct BuildingDetailView: View {
                     .padding([.leading, .trailing])
                 Spacer()
                 Button(action: {
-//                    building.favourite.toggle()
+                    //                    building.favourite.toggle()
                     DataManager.shared.toggleFavourite(for: building.id)
                 }) {
                     Image(systemName: building.favourite ? "heart.fill" : "heart")
@@ -55,36 +55,15 @@ struct BuildingDetailView: View {
                 
             }
             .padding(/*@START_MENU_TOKEN@*/.horizontal/*@END_MENU_TOKEN@*/)
-            
-            
             Text(building.description)
                 .font(.body)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding()
-            
-            Map(coordinateRegion: .constant(mapRegion()),
-                annotationItems: [building]) { building in
-                MapAnnotation(coordinate: building.polygon.coordinate) {
-                    PolygonAnnotationView(polygon: building.polygon)
-                }
-            }
-                .frame(height: 250)
+            MapView(polygon: building.polygon, region: MKCoordinateRegion(building.polygon.boundingMapRect))
+                                .frame(height: 300)
+                                .padding(.top)
         }
         .navigationTitle("Szczegóły Budynku")
-    }
-    
-    private func mapRegion() -> MKCoordinateRegion {
-            let polygon = building.polygon
-            let region = MKCoordinateRegion(polygon.boundingMapRect)
-            return region
-        }
-}
-
-struct PolygonAnnotationView: View {
-    var polygon: MKPolygon
-
-    var body: some View {
-        // Tu możesz zdefiniować, jak ma wyglądać widok dla wielokąta, np. znacznik
     }
 }
 
